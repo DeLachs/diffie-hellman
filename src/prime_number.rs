@@ -1,6 +1,6 @@
 use num::bigint::{BigInt, RandBigInt, BigUint};
 use num::bigint::Sign;
-use num::{range, pow};
+use num::{pow, range, Zero};
 use std::ops::Shr;
 
 
@@ -12,28 +12,27 @@ pub fn generate_prime_number(bits: u64) -> BigInt {
 
     // Generate ``bits`` large prime number.
     let mut counter = 0;    //DEBUG
-    let mut random_bigint = BigInt::default();
+    let mut random_bigint = BigInt::zero();
     let mut is_prime = false;
     while !is_prime {
+        random_bigint = BigInt::zero();
         counter += 1;   //DEBUG
-        println!("iteration: {}", counter); //DEBUG
         // Generate uneven BigInt ``random_bigint``.
-        while random_bigint.clone() % 2 == BigInt::from(0) {
+        while &random_bigint % 2 == BigInt::from(0) {    // .clone() is a bad idea because it won't be the right number.
             random_bigint = rand_bigint(bits);
-            //println!("DEBUG: big int: {}", random_bigint);  //DEBUG
         }
-        //println!("DEBUG: big uneven int: {}", random_bigint);   //DEBUG
 
-        //TODO: fix this shit below. It didn't succeed after 2494833 iterations and seems like it won't ever.
         // Check if ``random_bigint`` passes ``check_low_level_prime()``.
         let result = check_low_level_prime(&random_bigint, &first_primes_list);
 
         // If ``result`` is true run the miller rabin test.
         if result {
-            println!("DEBUG: check_low_level_prime() passed, potential prime: {}", random_bigint); //DEBUG
             let result = is_miller_rabin_passed(&random_bigint);
-            println!("miller_rabin_passed: {}", result);
             if result {
+                //TODO: Debug logging?
+                println!("DEBUG: miller_rabin_passed: {}", result);
+                println!("DEBUG: iterrations: {}", counter);
+                println!("DEBUG: the number is: {}", random_bigint);
                 is_prime = true;
             }
         }

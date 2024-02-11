@@ -33,9 +33,11 @@ fn simple_example() {
 }
 
 fn main() {
-    //the_real_thing();
-    //simple_example();
-    time_function!(generate_prime_number(4096));
+    // 4096 long number needs to be a prime number.
+    let n = time_function!(generate_prime_number(4096));
+    println!("{}", n);
+    //TODO: let g = primitive root of n
+    //TODO: let secret_number_a = secret_number_a >= 1 && secret_number_a <= n - 2
 }
 
 //TODO unfinished
