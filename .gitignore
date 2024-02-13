@@ -1,3 +1,4 @@
 /target
 /.vscode
 test.sh
+.DS_Store

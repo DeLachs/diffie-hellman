@@ -2,12 +2,13 @@ use num::bigint::{BigInt, RandBigInt, BigUint};
 use num::bigint::Sign;
 use num::{pow, range, Zero};
 use std::ops::Shr;
+use log::debug;
 
 
 pub fn generate_prime_number(bits: u64) -> BigInt {
     // Code below was used to generate the first_primes_list that gets used in ``check_low_level_prime()``:
     let first_primes_list = sieve_of_eratosthenes(8192);
-    println!("found {} first primes", first_primes_list.len());
+    debug!("Found {} first primes for the check_low_level_prime()", first_primes_list.len());
 
 
     // Generate ``bits`` large prime number.
@@ -30,9 +31,9 @@ pub fn generate_prime_number(bits: u64) -> BigInt {
             let result = is_miller_rabin_passed(&random_bigint);
             if result {
                 //TODO: Debug logging?
-                println!("DEBUG: miller_rabin_passed: {}", result);
-                println!("DEBUG: iterrations: {}", counter);
-                println!("DEBUG: the number is: {}", random_bigint);
+                debug!("miller_rabin_passed(): {}", result);
+                debug!("Iterrations: {}", counter);
+                debug!("Prime number: {}", random_bigint);
                 is_prime = true;
             }
         }
@@ -105,10 +106,12 @@ fn is_miller_rabin_passed(miller_rabin_candidate: &BigInt) -> bool {
         even_component = even_component.clone().shr(1);
         max_divisions_by_two += 1;
     }
-    //TODO: Keep line number up to date KEKW.
     assert!(
         BigInt::pow(&BigInt::from(2), max_divisions_by_two) * &even_component == miller_rabin_candidate - 1,
-        "prime_numbers.rs line 72"
+        "max_divisions_by_two = {}, even_component = {}, miller_rabin_candidate: {}",
+        max_divisions_by_two,
+        even_component,
+        miller_rabin_candidate
     );
 
     
