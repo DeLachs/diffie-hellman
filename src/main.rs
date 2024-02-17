@@ -4,6 +4,9 @@ mod primitive_root;
 mod client;
 mod server;
 
+use std::process::exit;
+use log::error;
+
 use prime_number::generate_prime_number;
 use primitive_root::generate_primitive_root;
 use client::send_stream;
@@ -25,7 +28,10 @@ fn main() {
     let result = time_function!(send_stream());
     let result = match result {
         Ok(()) => true,
-        Err(_) => false
+        Err(e) => {
+            error!("{}", e);
+            exit(1);
+        }
     };
     println!("{}", result);
 }

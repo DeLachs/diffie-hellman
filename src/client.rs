@@ -5,7 +5,6 @@ pub fn send_stream() -> io::Result<()> {
     // Establish a TCP connection with the far end
     let mut stream = TcpStream::connect("127.0.0.1:34612")?;
 
-
     let data = b"Hello";    
     // ``write_all()`` will return ``Err(io::Error(io::ErrorKind::Interrupted))``
     // if it is unable to queue all bytes.
