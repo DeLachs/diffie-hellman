@@ -1,21 +1,33 @@
 mod benchmark;
 mod prime_number;
 mod primitive_root;
+mod client;
+mod server;
 
 use prime_number::generate_prime_number;
 use primitive_root::generate_primitive_root;
+use client::send_stream;
 
 fn main() {
     // Initialize logging with env_logger
     env_logger::init();
 
     // 4096 long number needs to be a prime number.
-    let p = time_function!(generate_prime_number(4096));
+    //let p = time_function!(generate_prime_number(4096));
     //println!("p: {}", p);
     //TODO: let g = primitive root of n
-    let g = time_function!(generate_primitive_root(&p));
-    println!("g: {}", g);
+    //let g = time_function!(generate_primitive_root(&p));
+    //println!("g: {}", g);
     //TODO: let secret_number_a = secret_number_a >= 1 && secret_number_a <= n - 2
+
+
+    //TODO: the sending and receiving
+    let result = time_function!(send_stream());
+    let result = match result {
+        Ok(()) => true,
+        Err(_) => false
+    };
+    println!("{}", result);
 }
 
 //fn the_real_thing() {
