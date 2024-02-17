@@ -12,14 +12,14 @@ pub fn generate_prime_number(bits: u64) -> BigInt {
 
 
     // Generate ``bits`` large prime number.
-    let mut counter = 0;    //DEBUG
+    let mut counter = 0;
     let mut random_bigint = BigInt::zero();
     let mut is_prime = false;
     while !is_prime {
         random_bigint = BigInt::zero();
-        counter += 1;   //DEBUG
+        counter += 1;
         // Generate uneven BigInt ``random_bigint``.
-        while &random_bigint % 2 == BigInt::from(0) {    // .clone() is a bad idea because it won't be the right number.
+        while &random_bigint % 2 == BigInt::from(0) {
             random_bigint = rand_bigint(bits);
         }
 
@@ -30,7 +30,6 @@ pub fn generate_prime_number(bits: u64) -> BigInt {
         if result {
             let result = is_miller_rabin_passed(&random_bigint);
             if result {
-                //TODO: Debug logging?
                 debug!("miller_rabin_passed(): {}", result);
                 debug!("Iterrations: {}", counter);
                 debug!("Prime number: {}", random_bigint);
