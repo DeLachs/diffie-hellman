@@ -31,7 +31,7 @@ pub fn generate_prime_number(bits: u64) -> BigInt {
             let result = is_miller_rabin_passed(&random_bigint);
             if result {
                 debug!("miller_rabin_passed(): {}", result);
-                debug!("Iterrations: {}", counter);
+                debug!("Iterations: {}", counter);
                 debug!("Prime number: {}", random_bigint);
                 is_prime = true;
             }
