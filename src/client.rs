@@ -1,28 +1,21 @@
-use std::io::{self, Write};
+#[path = "lines_codec.rs"] mod lines_codec;
+
+use std::io;
 use std::net::TcpStream;
+use lines_codec::LinesCodec;
 
-pub fn send_stream() -> io::Result<()> {
+pub fn send_stream(server: &str, message: &str) -> io::Result<String> {
     // Establish a TCP connection with the far end
-    let mut stream = TcpStream::connect("127.0.0.1:34612")?;
+    let stream = TcpStream::connect(server)?;
 
-    let data = b"Hello";    
-    // ``write_all()`` will return ``Err(io::Error(io::ErrorKind::Interrupted))``
-    // if it is unable to queue all bytes.
-    stream.write_all(data)?;
-    // Tell TCP to send the buffered data on the wire
-    stream.flush()?;
+    // Codec is our interface for reading/writing messages.
+    // No need to handle reading/writing directly
+    let mut codec = LinesCodec::new(stream)?;
 
-    Ok(())
+    // Serializing & Sending is nor just one line
+    codec.send_message(message)?;
+
+    let received_message = codec.read_message()?;
+
+    Ok(received_message)
 }
-
-/*
-let mut stream = TcpStream::connect("127.0.0.1:34612")?;
-
-is equal to:
-
-let mut stream = TcpStream::connect("127.0.0.1:34612")?;
-let mut stream = match stream {
-    Ok(c) => c,
-    Err(e) => return Err(e)
-};
-*/
