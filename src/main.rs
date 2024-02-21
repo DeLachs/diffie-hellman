@@ -1,3 +1,6 @@
+//! -s 127.0.0.1:34612 passwd
+//! -c 127.0.0.1:34612 passwd
+
 mod benchmark;
 mod prime_number;
 mod primitive_root;
@@ -6,9 +9,8 @@ mod server;
 
 use std::process::exit;
 use std::env;
-use log::{info, error};
+use log::{debug, info, error};
 use env_logger::Env;
-use num::bigint::{BigInt, RandBigInt};
 
 use prime_number::generate_prime_number;
 use primitive_root::generate_primitive_root;
@@ -27,15 +29,7 @@ fn main() {
 
     // Collect command line arguments
     let args: Vec<String> = env::args().collect();
-
-    //TODO: something for later
-    /*
-    if args.len() == 4 && (args[2] == "-c".to_string() || args[2] == "-c".to_string()) {
-        println!("yay");
-    }
-    */
-    println!("{:?}", args);
-
+    debug!("{:?}", args);
     let args = Args {
         is_server: if args[1] == "-s".to_string() {true} else {false},
         addr: args[2].clone(),
@@ -44,6 +38,12 @@ fn main() {
 
     //TODO: the sending and receiving
     if args.is_server {
+        // Generating the ``p`` and ``g`` before starting to listen.
+        // 4096 long number needs to be a prime number.
+        let p = time_function!(generate_prime_number(4096));
+        let _g = time_function!(generate_primitive_root(&p));
+
+
         let result = server(args.addr.as_str());
         let result = match result {
             Ok(()) => true,
@@ -67,10 +67,6 @@ fn main() {
 
 
     /*
-    // 4096 long number needs to be a prime number.
-    let p = time_function!(generate_prime_number(4096));
-    let g = time_function!(generate_primitive_root(&p));
-
     // Initialize person A and person B with p and g
     let mut a = Person::new(&p, &g);
     let mut b = Person::new(&p, &g);
@@ -99,6 +95,7 @@ fn main() {
     */
 }
 
+/*
 struct Person {
     p: BigInt,
     g: BigInt,
@@ -133,6 +130,7 @@ impl Person {
         self.key = self.gsp_received.modpow(&self.secret_number, &self.p);
     }
 }
+*/
 
 
 

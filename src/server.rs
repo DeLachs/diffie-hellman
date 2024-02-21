@@ -2,7 +2,7 @@
 
 use std::io;
 use std::net::{TcpListener, TcpStream};
-use log::{info, error};
+use log::{debug, info, error};
 
 use lines_codec::LinesCodec;
 
@@ -21,17 +21,23 @@ pub fn server(addr: &str) -> io::Result<()> {
     Ok(())
 }
 
-
 /// Given a TcpStream:
 /// - Deserialize the message
 /// - Serialize and write the echo message to the stream
 fn handle_connection(stream: TcpStream) -> io::Result<()> {
     let mut codec = LinesCodec::new(stream)?;
     // Read & Reverse the received message
-    let message: String = codec
-        .read_message()
-        // Reverse message
-        .map(|m| m.chars().rev().collect())?;
+    let message: String = codec.read_message()?;
+
+    debug!("{}", message);
+    
+    // Check if HELLOSERVER
+    if message == "HELLOSERVER".to_string() {
+        codec.send_message("OK")?;
+    }
+
+    // Read the real message
+    let message: String = codec.read_message()?;
 
     info!("{}", message);
 
