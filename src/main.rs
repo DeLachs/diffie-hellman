@@ -140,7 +140,7 @@ let mut stream = TcpStream::connect("127.0.0.1:34612")?;
 
 is equal to:
 
-let mut stream = TcpStream::connect("127.0.0.1:34612")?;
+let mut stream = TcpStream::connect("127.0.0.1:34612");
 let mut stream = match stream {
     Ok(c) => c,
     Err(e) => return Err(e)

@@ -1,7 +1,24 @@
 ## protocol
 
 1. Client says ``HELLOSERVER``.
+
+```json
+{
+    "inf": "HELLOSERVER"
+}
+```
+
 2. Server answers with ``G, P, and GSP``.
+
+```json
+{
+    "inf": "NUMBERS",
+    "G": 4123,
+    "P": 9,
+    "GSP": 234
+}
+```
+
 3. Client responds with his own ``GSP``.
 
 *Now both have the private key*
