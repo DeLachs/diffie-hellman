@@ -6,6 +6,7 @@ mod prime_number;
 mod primitive_root;
 mod client;
 mod server;
+mod dh_helpers;
 
 use std::process::exit;
 use std::env;
@@ -16,6 +17,7 @@ use prime_number::generate_prime_number;
 use primitive_root::generate_primitive_root;
 use client::send_stream;
 use server::server;
+use dh_helpers::generate_secret;
 
 struct Args {
     is_server: bool,
@@ -36,15 +38,18 @@ fn main() {
         passwd: args[3].clone(),
     };
 
-    //TODO: the sending and receiving
+    //? SERVER
     if args.is_server {
-        // Generating the ``p`` and ``g`` before starting to listen.
+        // Generating the ``p``, ``g`` and the secret before starting to listen.
         // 4096 long number needs to be a prime number.
         let p = time_function!(generate_prime_number(4096));
-        let _g = time_function!(generate_primitive_root(&p));
+        let g = time_function!(generate_primitive_root(&p));
+        let secret = generate_secret(&p);   //TODO decide where to generate secrets and do is on in roughly the same place on the client side.
 
 
-        let result = server(args.addr.as_str());
+        // I don't like to pass the args without a reference, but I couldn't got it working
+        // and the values aren't used later.
+        let result = server(args.addr.as_str(), p, g, secret);
         let result = match result {
             Ok(()) => true,
             Err(e) => {
@@ -53,7 +58,10 @@ fn main() {
             }
         };
         info!("{}", result);
-    } else {
+    }
+    
+    //? CLIENT
+    if !args.is_server {
         let result = time_function!(send_stream(args.addr.as_str(), args.passwd.as_str()));
         let result = match result {
             Ok(msg) => msg,

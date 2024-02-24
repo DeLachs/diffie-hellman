@@ -4,7 +4,7 @@
 
 ```json
 {
-    "inf": "HELLOSERVER"
+    "inf": "HelloServer"
 }
 ```
 
@@ -12,7 +12,7 @@
 
 ```json
 {
-    "inf": "NUMBERS",
+    "inf": "NumbersServer",
     "G": 4123,
     "P": 9,
     "GSP": 234
@@ -21,9 +21,22 @@
 
 3. Client responds with his own ``GSP``.
 
-*Now both have the private key*
+```json
+{
+    "inf": "NumbersClient",
+    "GSP": 2634
+}
+```
 
-4. Server sends an encrypted ``OK``.
+4. Server sends an ``OK``.
+
+```json
+{
+    "inf": "OkServer"
+}
+```
+
+*Now both have the private key*
 
 *A "secure" connection is now established.*
 

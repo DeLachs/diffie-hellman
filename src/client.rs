@@ -1,22 +1,14 @@
-#[path = "lines_codec.rs"] mod lines_codec;
+#[path = "dh_json_codec.rs"] mod dh_json_codec;
+#[path = "dh_helpers.rs"] mod dh_helpers;
 
 use std::io;
 use std::process::exit;
 use std::net::TcpStream;
-use lines_codec::LinesCodec;
-use log::error;
+use dh_json_codec::{Message, DHJsonCodec};
+use log::{debug, info, error};
+use num::bigint::BigInt;
 
-//TODO: working with a struct to store these things goes in the right direction
-// I could do it on the server the same way but with a list to store the structs of multiple servers...
-// or a hashmap to map these to there IP.
-/*
-struct Client {
-    p: BigInt,
-    g: BigInt,
-    secret_number: BigInt,
-    key: BigInt,
-}
-*/
+use self::dh_helpers::{calculate_gsp, calculate_key, generate_secret};
 
 pub fn send_stream(server: &str, message: &str) -> io::Result<String> {
     // Establish a TCP connection with the far end
@@ -24,22 +16,46 @@ pub fn send_stream(server: &str, message: &str) -> io::Result<String> {
 
     // Codec is our interface for reading/writing messages.
     // No need to handle reading/writing directly
-    let mut codec = LinesCodec::new(stream)?;
+    let mut codec = DHJsonCodec::new(stream)?;
 
-    // Serializing & Sending is nor just one line
-    codec.send_message("HELLOSERVER")?;
+    // Create and send the first message (``HelloServer`` (Client -> Server))
+    codec.send_message(&Message::HelloServer)?;
 
-    let received_message = codec.read_message()?;
-    
-    if received_message == "OK" {
-        codec.send_message(message)?;
+    //? stupid test:
+    // read answer
+    let answer = codec.read_message()?;
+    // open new stream to send new stuff. Needs to be done after receiving the answer.
+    let stream = TcpStream::connect(server)?;
+    let mut codec = DHJsonCodec::new(stream)?;
+    match answer {
+        Message::NumbersServer { g, p, gsp } => {
+            let secret = generate_secret(&p);   //TODO decide where to generate secrets and do is on in roughly the same place on the server side.
+            let gsp_to_send = calculate_gsp(&g, &secret, &p);
+            // send gdp_to_send
+            codec.send_message(&Message::NumbersClient { gsp: gsp_to_send })?;
+            //TODO: print key for now
+            let key = calculate_key(&gsp, &secret, &p);
+            debug!("key: {}", key);
+        }
+        _ => {
+            error!("Received an invalid response from the server: {}", server);
+            exit(1);
+        }
     }
-    else {
-        error!("received no OK from the server: {}", server);
-        exit(1);
+    // read answer
+    let answer = codec.read_message()?;
+    // open new stream to send new stuff. Needs to be done after receiving the answer.
+    let stream = TcpStream::connect(server)?;
+    let mut codec = DHJsonCodec::new(stream)?;
+    match answer {
+        Message::OkServer => {
+            debug!("Received OkServer");
+        }
+        _ => {
+            error!("Received an invalid response from the server: {}", server);
+            exit(1);
+        }
     }
 
-    let received_message = codec.read_message()?;
-
-    Ok(received_message)
+    Ok("test".to_string())
 }
