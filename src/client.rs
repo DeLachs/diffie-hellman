@@ -5,12 +5,11 @@ use std::io;
 use std::process::exit;
 use std::net::TcpStream;
 use dh_json_codec::{Message, DHJsonCodec};
-use log::{debug, info, error};
-use num::bigint::BigInt;
+use log::{debug, error};
 
 use self::dh_helpers::{calculate_gsp, calculate_key, generate_secret};
 
-pub fn send_stream(server: &str, message: &str) -> io::Result<String> {
+pub fn send_stream(server: &str, _message: &str) -> io::Result<String> {
     // Establish a TCP connection with the far end
     let stream = TcpStream::connect(server)?;
 
@@ -46,7 +45,7 @@ pub fn send_stream(server: &str, message: &str) -> io::Result<String> {
     let answer = codec.read_message()?;
     // open new stream to send new stuff. Needs to be done after receiving the answer.
     let stream = TcpStream::connect(server)?;
-    let mut codec = DHJsonCodec::new(stream)?;
+    let mut _codec = DHJsonCodec::new(stream)?;
     match answer {
         Message::OkServer => {
             debug!("Received OkServer");

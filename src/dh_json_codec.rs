@@ -1,7 +1,7 @@
 use std::io::{self, Read, Write};
 use std::net::TcpStream;
 use std::process::exit;
-use log::{debug, info, error};
+use log::{debug, error};
 use num::BigInt;
 use serde::{Deserialize, Serialize};
 
