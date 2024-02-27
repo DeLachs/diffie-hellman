@@ -62,7 +62,7 @@ impl DHJsonCodec {
         let mut length = [0; 2];
         self.reader.read_exact(&mut length)?;
         let length = u16::from_be_bytes(length);  //TODO: u64 not usize
-        println!("message receive length: {}", length);
+        debug!("message receive length: {}", length);
 
         let mut test_vec: Vec<u8> = vec![0; usize::from(length)];
         self.reader.read_exact(&mut test_vec)?;
@@ -70,7 +70,7 @@ impl DHJsonCodec {
         let test = match test {
             Ok(x) => x,
             Err(e) => {
-                println!("{}", e);
+                error!("{}", e);
                 exit(1);
             }
         };
@@ -79,4 +79,3 @@ impl DHJsonCodec {
         Ok(j)
     }
 }
-

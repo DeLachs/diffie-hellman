@@ -1,6 +1,12 @@
-## protocol
+# Diffie Hellman
 
-1. Client says ``HELLOSERVER``.
+This is a self written implementation with a somewhat custom protocol. It isn't meant to be used for anything and is not secure in any way.
+
+## The "Protocol"
+
+The protocol uses a 16 bit long unsigned integer that is send before the rest of the "package" to indicate the length of the message. After that comes the real content that is encoded in JSON because it is relative easy to work with. The 16 bit long unsigned integer implements also some sort of message length limit which isn't enforced but stops the client with a error log entry.
+
+1. Client -> Server: ``HELLOSERVER`` to say hello and get ``G, P, and GSP``.
 
 ```json
 {
@@ -8,7 +14,7 @@
 }
 ```
 
-2. Server answers with ``G, P, and GSP``.
+2. Server -> Client: ``G, P, and GSP``. Numbers needed by the client to generate a key.
 
 ```json
 {
@@ -19,7 +25,7 @@
 }
 ```
 
-3. Client responds with his own ``GSP``.
+3. Client -> Server: The clients ``GSP`` for use in the key.
 
 ```json
 {
@@ -28,7 +34,7 @@
 }
 ```
 
-4. Server sends an ``OK``.
+4. Server -> Client: ``OK`` to signal that everything worked out.
 
 ```json
 {
@@ -36,13 +42,10 @@
 }
 ```
 
-*Now both have the private key*
+*Now both server and client have the private key.*
 
-*A "secure" connection is now established.*
+## Things that could be implemented
 
-7. Client sends the first (and for now the last) message.
-
-### for later implementation between 4 and 7
-
-5. Client responds with the password
-6. If server accepts the password it sends true else it sends false and won't accept messages from the client.
+- A correct way to generate a primitive root.
+- AES to send something encrypted (not in a secure way).
+- Some way of authentication for clients. Like sending a password after the key exchange.

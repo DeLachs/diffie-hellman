@@ -2,7 +2,7 @@ use num::bigint::{BigInt, RandBigInt};
 use num::Integer;
 use log::debug;
 
-///TODO: Make a doc string.
+///TODO: Do it the right way. Currently not the correct way to generate this number.
 pub fn generate_primitive_root(prime: &BigInt) -> BigInt {
     /*
     source: https://math.stackexchange.com/questions/2190342/simple-question-about-generating-random-primitive-roots-for-a-large-prime
