@@ -1,21 +1,21 @@
 mod benchmark;
-mod prime_number;
-mod primitive_root;
 mod dh_helpers;
 mod dh_json_codec;
+mod prime_number;
+mod primitive_root;
 
-use std::process::exit;
-use std::env;
-use log::{debug, info, error};
 use env_logger::Env;
+use log::{debug, error, info};
+use num::BigInt;
+use std::env;
 use std::io;
 use std::net::{TcpListener, TcpStream};
-use num::BigInt;
+use std::process::exit;
 
+use dh_helpers::{calculate_gsp, calculate_key, generate_secret};
+use dh_json_codec::{DHJsonCodec, Message};
 use prime_number::generate_prime_number;
 use primitive_root::generate_primitive_root;
-use dh_json_codec::{Message, DHJsonCodec};
-use dh_helpers::{calculate_gsp, calculate_key, generate_secret};
 
 struct Args {
     is_server: bool,
@@ -30,14 +30,18 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     debug!("{:?}", args);
     let args = Args {
-        is_server: if args[1] == "-s".to_string() {true} else {false},
+        is_server: if args[1] == "-s".to_string() {
+            true
+        } else {
+            false
+        },
         addr: {
             if args.len() == 3 {
                 args[2].clone()
             } else {
                 "127.0.0.1:34612".to_string()
             }
-        }
+        },
     };
 
     //? SERVER
@@ -51,7 +55,7 @@ fn main() {
             }
         };
     }
-    
+
     //? CLIENT
     if !args.is_server {
         let result = time_function!(send_stream(args.addr.as_str()));
@@ -77,7 +81,7 @@ fn server(addr: &str) -> io::Result<()> {
     //let p = time_function!(generate_prime_number(4096));
     //let g = time_function!(generate_primitive_root(&p));
     let secret = generate_secret(&p);
-    let gsp_to_send = calculate_gsp(&g, &secret, &p);   // I could have done this outside this function.
+    let gsp_to_send = calculate_gsp(&g, &secret, &p); // I could have done this outside this function.
 
     info!("Starting server on: {}", addr);
 
@@ -108,7 +112,7 @@ fn handle_connection(
     p: BigInt,
     g: BigInt,
     secret: BigInt,
-    gsp_to_send: BigInt
+    gsp_to_send: BigInt,
 ) -> io::Result<()> {
     let mut codec = DHJsonCodec::new(stream)?;
     // Read & Reverse the received message
@@ -123,7 +127,7 @@ fn handle_connection(
                 gsp: gsp_to_send.clone(),
             };
             codec.send_message(&answer)?;
-        },
+        }
         // If client send Message::NumbersClient -> calculate key and respond with Message::OkServer.
         Message::NumbersClient { gsp } => {
             let key = calculate_key(&gsp, &secret, &p);

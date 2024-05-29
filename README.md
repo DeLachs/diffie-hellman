@@ -2,6 +2,22 @@
 
 This is a self written implementation with a somewhat custom protocol. It isn't meant to be used for anything and is not secure in any way.
 
+## How to use
+
+### Server
+
+```bash
+# If no IP address is provided server will use the default address of localhost.
+./diffie-helmann -s 127.0.0.1:34612
+```
+
+### Client
+
+```bash
+# If no IP address is provided client will use the default address of localhost.
+./diffie-helmann -c 127.0.0.1:34612
+```
+
 ## The "Protocol"
 
 The protocol uses a 16 bit long unsigned integer that is send before the rest of the "package" to indicate the length of the message. After that comes the real content that is encoded in JSON because it is relative easy to work with. The 16 bit long unsigned integer implements also some sort of message length limit which isn't enforced but stops the client with a error log entry.
