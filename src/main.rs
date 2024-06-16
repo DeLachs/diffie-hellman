@@ -30,11 +30,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     debug!("{:?}", args);
     let args = Args {
-        is_server: if args[1] == "-s".to_string() {
-            true
-        } else {
-            false
-        },
+        is_server: (args[1] == *"-s"),
         addr: {
             if args.len() == 3 {
                 args[2].clone()
@@ -81,25 +77,24 @@ fn server(addr: &str) -> io::Result<()> {
     //let p = time_function!(generate_prime_number(4096));
     //let g = time_function!(generate_primitive_root(&p));
     let secret = generate_secret(&p);
-    let gsp_to_send = calculate_gsp(&g, &secret, &p); // I could have done this outside this function.
+    // I could have done this outside this function.
+    let gsp_to_send = calculate_gsp(&g, &secret, &p);
 
     info!("Starting server on: {}", addr);
 
     let listener = TcpListener::bind(addr)?;
-    for stream in listener.incoming() {
-        if let Ok(stream) = stream {
-            // The variables need to be cloned to ensure that the reference lives long enough.
-            // Only needs to be done if the if statement is true.
-            let p = p.clone();
-            let g = g.clone();
-            let secret = secret.clone();
-            let gsp_to_send = gsp_to_send.clone();
-            std::thread::spawn(move || {
-                // The values don't need to be a reference because they are a one time use thing
-                // that gets cloned before the new thread.
-                handle_connection(stream, p, g, secret, gsp_to_send).map_err(|e| error!("{}", e))
-            });
-        }
+    for stream in listener.incoming().flatten() {
+        // The variables need to be cloned to ensure that the reference lives long enough.
+        // Only needs to be done if the if statement is true.
+        let p = p.clone();
+        let g = g.clone();
+        let secret = secret.clone();
+        let gsp_to_send = gsp_to_send.clone();
+        std::thread::spawn(move || {
+            // The values don't need to be a reference because they are a one time use thing
+            // that gets cloned before the new thread.
+            handle_connection(stream, p, g, secret, gsp_to_send).map_err(|e| error!("{}", e))
+        });
     }
     Ok(())
 }
